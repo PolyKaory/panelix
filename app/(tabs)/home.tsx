@@ -69,6 +69,13 @@ export default function Home() {
         Looking for your favourite meal
       </Text>
 
+      <Link href="/favoritos" asChild>
+  <Pressable style={{ backgroundColor: '#f66', padding: 10, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 15 }}>
+    <Text style={{ color: '#fff', fontWeight: 'bold' }}>⭐ Ver Favoritos</Text>
+  </Pressable>
+</Link>
+
+
       {/* Busca */}
       <View style={{ flexDirection: 'row', marginBottom: 20 }}>
         <TextInput

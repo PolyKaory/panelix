@@ -1,7 +1,7 @@
 import { View, Text, FlatList, Image, Pressable } from 'react-native';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocalSearchParams, Link } from 'expo-router'; // Importe useLocalSearchParams
+import { useLocalSearchParams, Link } from 'expo-router'; // Usamos Link para navegação
 
 interface Meal {
   idMeal: string;
@@ -10,7 +10,7 @@ interface Meal {
 }
 
 export default function CategoryMeals() {
-  const { category } = useLocalSearchParams(); // Obtenha o parâmetro 'category'
+  const { category } = useLocalSearchParams(); // Pega o nome da categoria da URL
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,11 +51,15 @@ export default function CategoryMeals() {
       <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>
         Refeições em {category}
       </Text>
+
       <FlatList
         data={meals}
         keyExtractor={(item) => item.idMeal}
         renderItem={({ item }) => (
-<Link href={`/detalhes/${item.idMeal}`} asChild>            <Pressable style={{ flexDirection: 'row', marginBottom: 15, alignItems: 'center' }}>
+          <Link href={`/detalhes/${item.idMeal}`} asChild>
+            <Pressable
+              style={{ flexDirection: 'row', marginBottom: 15, alignItems: 'center' }}
+            >
               <Image
                 source={{ uri: item.strMealThumb }}
                 style={{ width: 80, height: 80, borderRadius: 10, marginRight: 10 }}

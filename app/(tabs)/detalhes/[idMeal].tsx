@@ -1,7 +1,8 @@
-import { View, Text, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Image, ScrollView, ActivityIndicator, Pressable } from 'react-native';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocalSearchParams } from 'expo-router'; // Importe useLocalSearchParams
+import { useLocalSearchParams } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface MealDetail {
   idMeal: string;
@@ -10,19 +11,19 @@ interface MealDetail {
   strInstructions: string;
   strCategory: string;
   strArea: string;
-  // Adicione outras propriedades conforme necessário da resposta da API
-  [key: string]: string; // Para lidar com propriedades dinâmicas de ingrediente/medida
+  [key: string]: string;
 }
 
 export default function MealDetails() {
-  const { idMeal } = useLocalSearchParams(); // Obtenha o parâmetro 'idMeal'
+  const { idMeal } = useLocalSearchParams();
   const [mealDetail, setMealDetail] = useState<MealDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     if (idMeal) {
       fetchMealDetails(idMeal as string);
+      checkIfFavorite(idMeal as string);
     }
   }, [idMeal]);
 
@@ -36,8 +37,7 @@ export default function MealDetails() {
         setMealDetail(null);
       }
     } catch (err) {
-      console.error("Erro ao buscar detalhes da refeição:", err);
-      setError("Falha ao carregar os detalhes da refeição.");
+      console.error("Erro ao buscar detalhes:", err);
     } finally {
       setLoading(false);
     }
@@ -55,55 +55,73 @@ export default function MealDetails() {
     return ingredients;
   };
 
+  const toggleFavorite = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('@favoritos');
+      const parsed = stored ? JSON.parse(stored) : [];
+
+      if (isFavorite) {
+        const updated = parsed.filter((item: MealDetail) => item.idMeal !== mealDetail?.idMeal);
+        await AsyncStorage.setItem('@favoritos', JSON.stringify(updated));
+        setIsFavorite(false);
+      } else {
+        await AsyncStorage.setItem('@favoritos', JSON.stringify([...parsed, mealDetail]));
+        setIsFavorite(true);
+      }
+    } catch (err) {
+      console.error("Erro ao atualizar favoritos:", err);
+    }
+  };
+
+  const checkIfFavorite = async (id: string) => {
+    try {
+      const stored = await AsyncStorage.getItem('@favoritos');
+      const parsed = stored ? JSON.parse(stored) : [];
+      const found = parsed.find((item: MealDetail) => item.idMeal === id);
+      setIsFavorite(!!found);
+    } catch (err) {
+      console.error("Erro ao verificar favoritos:", err);
+    }
+  };
+
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#f66" />
-        <Text style={{ marginTop: 10 }}>Carregando detalhes da refeição...</Text>
+        <Text>Carregando detalhes...</Text>
       </View>
     );
   }
 
-  if (error) {
-    return <Text style={{ padding: 20, color: 'red' }}>{error}</Text>;
-  }
-
-  if (!mealDetail) {
-    return <Text style={{ padding: 20 }}>Refeição não encontrada.</Text>;
-  }
+  if (!mealDetail) return <Text style={{ padding: 20 }}>Refeição não encontrada.</Text>;
 
   const ingredientsList = getIngredients(mealDetail);
 
-  
   return (
-    <ScrollView style={{ flex: 1, padding: 20, backgroundColor: '#fff' }}>
+    <ScrollView style={{ padding: 20, backgroundColor: '#fff' }}>
       <Image
         source={{ uri: mealDetail.strMealThumb }}
         style={{ width: '100%', height: 250, borderRadius: 15, marginBottom: 20 }}
       />
-      <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10 }}>{mealDetail.strMeal}</Text>
-      <Text style={{ fontSize: 16, color: 'gray', marginBottom: 5 }}>
-        Categoria: {mealDetail.strCategory}
-      </Text>
-      <Text style={{ fontSize: 16, color: 'gray', marginBottom: 20 }}>
-        Área: {mealDetail.strArea}
+
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Text style={{ fontSize: 28, fontWeight: 'bold', flex: 1 }}>{mealDetail.strMeal}</Text>
+        <Pressable onPress={toggleFavorite}>
+          <Text style={{ fontSize: 28 }}>{isFavorite ? '💖' : '🤍'}</Text>
+        </Pressable>
+      </View>
+
+      <Text style={{ color: 'gray', marginBottom: 5 }}>
+        Categoria: {mealDetail.strCategory} | Área: {mealDetail.strArea}
       </Text>
 
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Ingredientes:</Text>
-      {ingredientsList.length > 0 ? (
-        ingredientsList.map((ingredient, index) => (
-          <Text key={index} style={{ fontSize: 16, marginBottom: 5 }}>
-            • {ingredient}
-          </Text>
-        ))
-      ) : (
-        <Text>Nenhum ingrediente listado.</Text>
-      )}
+      <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Ingredientes:</Text>
+      {ingredientsList.map((ingredient, index) => (
+        <Text key={index} style={{ fontSize: 16 }}>• {ingredient}</Text>
+      ))}
 
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Instruções:</Text>
-      <Text style={{ fontSize: 16, lineHeight: 24, marginBottom: 20 }}>
-        {mealDetail.strInstructions}
-      </Text>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Instruções:</Text>
+      <Text style={{ fontSize: 16, lineHeight: 24 }}>{mealDetail.strInstructions}</Text>
     </ScrollView>
   );
 }
