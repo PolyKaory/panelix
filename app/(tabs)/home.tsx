@@ -64,22 +64,21 @@ export default function Home() {
   return (
     <ScrollView style={{ padding: 20, backgroundColor: '#fff' }}>
       {/* Cabeçalho */}
-      <Text style={{ fontSize: 28, fontWeight: 'bold' }}>Cook Book</Text>
+      <Text style={{ fontSize: 28, fontWeight: 'bold' }}>Livro de Receitas</Text>
       <Text style={{ fontSize: 16, color: 'gray', marginBottom: 10 }}>
-        Looking for your favourite meal
+        Encontre sua refeição favorita
       </Text>
 
       <Link href="/favoritos" asChild>
-  <Pressable style={{ backgroundColor: '#f66', padding: 10, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 15 }}>
-    <Text style={{ color: '#fff', fontWeight: 'bold' }}>⭐ Ver Favoritos</Text>
-  </Pressable>
-</Link>
-
+        <Pressable style={{ backgroundColor: '#f66', padding: 10, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 15 }}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>⭐ Ver Favoritos</Text>
+        </Pressable>
+      </Link>
 
       {/* Busca */}
       <View style={{ flexDirection: 'row', marginBottom: 20 }}>
         <TextInput
-          placeholder="Search"
+          placeholder="Buscar"
           value={search}
           onChangeText={(text) => setSearch(text)}
           onSubmitEditing={searchMeals}
@@ -108,7 +107,7 @@ export default function Home() {
       {searchResults.length > 0 && (
         <>
           <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
-            Search Results
+            Resultados da Busca
           </Text>
           <FlatList
             data={searchResults}
@@ -154,8 +153,8 @@ export default function Home() {
             )}
           />
 
-          {/* Trending */}
-          <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Trending</Text>
+          {/* Em alta */}
+          <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Em Alta</Text>
           <FlatList
             data={trendingMeals}
             horizontal
@@ -177,7 +176,7 @@ export default function Home() {
           />
 
           {/* Catálogo */}
-          <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: 25, marginBottom: 10 }}>Catalogue</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: 25, marginBottom: 10 }}>Catálogo</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
             {catalogueMeals.map((item) => (
               <Link key={item.idMeal} href={`/detalhes/${item.idMeal}`} asChild>

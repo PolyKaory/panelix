@@ -1,7 +1,9 @@
 import { View, Text, FlatList, Image, Pressable } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Link } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native'; // Importação do useFocusEffect
+import { useCallback } from 'react'; // Importação do useCallback
 
 interface Meal {
   idMeal: string;
@@ -12,10 +14,6 @@ interface Meal {
 export default function Favoritos() {
   const [meals, setMeals] = useState<Meal[]>([]);
 
-  useEffect(() => {
-    loadFavorites();
-  }, []);
-
   const loadFavorites = async () => {
     try {
       const stored = await AsyncStorage.getItem('@favoritos');
@@ -25,6 +23,13 @@ export default function Favoritos() {
       console.error("Erro ao carregar favoritos:", err);
     }
   };
+
+  // Executa o efeito sempre que a tela está em foco
+  useFocusEffect(
+    useCallback(() => {
+      loadFavorites();
+    }, [])
+  );
 
   if (meals.length === 0) {
     return <Text style={{ padding: 20 }}>Você ainda não tem favoritos.</Text>;

@@ -1,7 +1,7 @@
 import { View, Text, FlatList, Image, Pressable } from 'react-native';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocalSearchParams, Link } from 'expo-router'; // Usamos Link para navegação
+import { useLocalSearchParams, useRouter } from 'expo-router'; 
 
 interface Meal {
   idMeal: string;
@@ -10,7 +10,8 @@ interface Meal {
 }
 
 export default function CategoryMeals() {
-  const { category } = useLocalSearchParams(); // Pega o nome da categoria da URL
+  const { category } = useLocalSearchParams(); 
+  const router = useRouter(); 
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,19 +50,18 @@ export default function CategoryMeals() {
   return (
     <View style={{ flex: 1, padding: 20, backgroundColor: '#fff' }}>
       {/* Botão para voltar para o Home */}
-      <Link href="/" asChild>
-        <Pressable
-          style={{
-            backgroundColor: '#f66',
-            padding: 10,
-            borderRadius: 20,
-            alignSelf: 'flex-start',
-            marginBottom: 15,
-          }}
-        >
-          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Voltar</Text>
-        </Pressable>
-      </Link>
+      <Pressable
+        onPress={() => router.replace('/')}
+        style={{
+          backgroundColor: '#f66',
+          padding: 10,
+          borderRadius: 20,
+          alignSelf: 'flex-start',
+          marginBottom: 15,
+        }}
+      >
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>Voltar</Text>
+      </Pressable>
 
       <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>
         Refeições em {category}
@@ -71,17 +71,16 @@ export default function CategoryMeals() {
         data={meals}
         keyExtractor={(item) => item.idMeal}
         renderItem={({ item }) => (
-          <Link href={`/detalhes/${item.idMeal}`} asChild>
-            <Pressable
-              style={{ flexDirection: 'row', marginBottom: 15, alignItems: 'center' }}
-            >
-              <Image
-                source={{ uri: item.strMealThumb }}
-                style={{ width: 80, height: 80, borderRadius: 10, marginRight: 10 }}
-              />
-              <Text style={{ flex: 1, fontSize: 16 }}>{item.strMeal}</Text>
-            </Pressable>
-          </Link>
+          <Pressable
+            onPress={() => router.push(`/detalhes/${item.idMeal}`)} // Navegação para detalhes
+            style={{ flexDirection: 'row', marginBottom: 15, alignItems: 'center' }}
+          >
+            <Image
+              source={{ uri: item.strMealThumb }}
+              style={{ width: 80, height: 80, borderRadius: 10, marginRight: 10 }}
+            />
+            <Text style={{ flex: 1, fontSize: 16 }}>{item.strMeal}</Text>
+          </Pressable>
         )}
       />
     </View>

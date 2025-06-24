@@ -1,7 +1,7 @@
 import { View, Text, Image, ScrollView, ActivityIndicator, Pressable } from 'react-native';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocalSearchParams, Link } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router'; // Substituí Link por useRouter para navegação programática
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface MealDetail {
@@ -16,6 +16,7 @@ interface MealDetail {
 
 export default function MealDetails() {
   const { idMeal } = useLocalSearchParams();
+  const router = useRouter(); // Hook para navegação programática
   const [mealDetail, setMealDetail] = useState<MealDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -99,20 +100,19 @@ export default function MealDetails() {
 
   return (
     <ScrollView style={{ padding: 20, backgroundColor: '#fff' }}>
-      {/* Botão para voltar para a página inicial */}
-      <Link href="/" asChild>
-        <Pressable
-          style={{
-            backgroundColor: '#f66',
-            padding: 10,
-            borderRadius: 20,
-            alignSelf: 'flex-start',
-            marginBottom: 15,
-          }}
-        >
-          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Voltar</Text>
-        </Pressable>
-      </Link>
+      {/* Botão para voltar para a página de favoritos */}
+      <Pressable
+        onPress={() => router.push('/favoritos')} // Navegação programática para a página de favoritos
+        style={{
+          backgroundColor: '#f66',
+          padding: 10,
+          borderRadius: 20,
+          alignSelf: 'flex-start',
+          marginBottom: 15,
+        }}
+      >
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>Voltar</Text>
+      </Pressable>
 
       <Image
         source={{ uri: mealDetail.strMealThumb }}
