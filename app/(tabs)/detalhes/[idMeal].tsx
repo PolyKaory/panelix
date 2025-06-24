@@ -1,7 +1,7 @@
 import { View, Text, Image, ScrollView, ActivityIndicator, Pressable } from 'react-native';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, Link } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface MealDetail {
@@ -99,6 +99,21 @@ export default function MealDetails() {
 
   return (
     <ScrollView style={{ padding: 20, backgroundColor: '#fff' }}>
+      {/* Botão para voltar para a página inicial */}
+      <Link href="/" asChild>
+        <Pressable
+          style={{
+            backgroundColor: '#f66',
+            padding: 10,
+            borderRadius: 20,
+            alignSelf: 'flex-start',
+            marginBottom: 15,
+          }}
+        >
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Voltar</Text>
+        </Pressable>
+      </Link>
+
       <Image
         source={{ uri: mealDetail.strMealThumb }}
         style={{ width: '100%', height: 250, borderRadius: 15, marginBottom: 20 }}

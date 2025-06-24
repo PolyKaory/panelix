@@ -48,6 +48,21 @@ export default function CategoryMeals() {
 
   return (
     <View style={{ flex: 1, padding: 20, backgroundColor: '#fff' }}>
+      {/* Botão para voltar para o Home */}
+      <Link href="/" asChild>
+        <Pressable
+          style={{
+            backgroundColor: '#f66',
+            padding: 10,
+            borderRadius: 20,
+            alignSelf: 'flex-start',
+            marginBottom: 15,
+          }}
+        >
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Voltar</Text>
+        </Pressable>
+      </Link>
+
       <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>
         Refeições em {category}
       </Text>
